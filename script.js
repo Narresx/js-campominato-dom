@@ -19,7 +19,7 @@ const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)
 
 
 // RECUPERO LA GRIGLIA
-const select = document.getElementById("choise");
+const select = document.getElementById("choice");
 const grid = document.getElementById("grid");
 const button = document.getElementById("confirm");
 
@@ -36,7 +36,7 @@ function start() {
 
     let columns;
 
-    switch (select.value) {
+    switch (choise.value) {
         case "medium":
             columns = 9;
             break;
@@ -51,7 +51,7 @@ function start() {
     const totalCells = columns * columns;
 
     const maxAttempts = totalCells - totalBombs;
-
+    let bombs = [];
 
     // GENERO UNA BOMBA
     const generateBombs = (totalBombs, totalNumber) => {
@@ -69,7 +69,7 @@ function start() {
     const generateGrid = (cellsNumber, cellsPerRow, bombs) => {
         for (let i = 1; i <= cellsNumber; i++) {
             const cell = createCell(i, cellsPerRow);
-            cell.addEventListener('click', (event) => onCellClick(event.target, bombs, i));
+            cell.addEventListener('click', onCellClick);
             grid.appendChild(cell);
         }
     }
@@ -77,6 +77,7 @@ function start() {
     // CREO LA CELLA
     function createCell(cellNumber, cellsPerRow) {
         const cell = document.createElement("div");
+        cell.id = cellNumber;
         cell.className = "cell";
         cell.innerText = cellNumber;
         const wh = `calc(100% / ${cellsPerRow})`;
@@ -86,15 +87,17 @@ function start() {
     }
 
     // Gestisco l'evento al click
-    function onCellClick(clickedCell, bombs, number) {
-        clickedCell.removeEventListener("click", onCellClick);
-        console.log('ciao');
+    function onCellClick(event) {
+        const cell = event.target;
+        cell.removeEventListener("click", onCellClick);
 
         // Controllo se è una bomba
+        let number = parseInt(cell.id);
+
         if (bombs.includes(number)) {
             gameOver(bombs, attempts, true);
         } else {
-            clickedCell.classList.add("safe")
+            cell.classList.add("safe")
             attempts++;
             if (attempts === maxAttempts) {
                 gameOver(bombs, attempts, false);
@@ -137,12 +140,10 @@ function start() {
 
     // Esecuzione
 
-    const bombs = generateBombs(totalBombs, totalCells)
+    bombs = generateBombs(totalBombs, totalCells)
     console.log(bombs);
 
     generateGrid(totalCells, columns, bombs);
 }
 
 button.addEventListener("click", () => start());
-
-
